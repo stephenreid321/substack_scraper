@@ -9,9 +9,9 @@ The script includes resume functionality - if it fails halfway through, it will
 skip newsletters that have already been scraped (by checking for existing CSV files).
 
 Usage:
-    python substack_scraper.py --urls urls.txt --from 2024-01-01 --to 2024-12-31 --output posts.csv
-    python substack_scraper.py --url https://example.substack.com --from 2024-01-01 --to 2024-12-31
-    python substack_scraper.py --user stephenreid --from 2024-01-01 --to 2024-12-31
+    python substack_scraper.py --urls urls.txt --from 2025-01-01 --to 2025-12-31 --output posts.csv
+    python substack_scraper.py --url https://example.substack.com --from 2025-01-01 --to 2025-12-31
+    python substack_scraper.py --user stephenreid --from 2025-01-01 --to 2025-12-31
 """
 
 import os
@@ -90,8 +90,8 @@ def parse_datetime(date_str: str, raise_on_error: bool = False) -> Optional[date
     
     # Try various datetime formats
     formats = [
-        '%Y-%m-%d %H:%M:%S',  # 2024-01-01 12:00:00
-        '%Y-%m-%d',           # 2024-01-01
+        '%Y-%m-%d %H:%M:%S',  # 2025-01-01 12:00:00
+        '%Y-%m-%d',           # 2025-01-01
         '%Y/%m/%d',           # 2024/01/01
         '%m/%d/%Y',           # 01/01/2024
         '%d/%m/%Y',           # 01/01/2024 (European)
@@ -527,10 +527,10 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  python substack_scraper.py --url https://example.substack.com --from 2024-01-01 --to 2024-12-31
+  python substack_scraper.py --url https://example.substack.com --from 2025-01-01 --to 2025-12-31
   python substack_scraper.py --urls newsletters.txt --from 2023-12-01 --to 2023-12-31 --output posts.csv
-  python substack_scraper.py --user stephenreid --from 2024-01-01 --to 2024-12-31
-  python substack_scraper.py --urls urls.txt --from "2024-01-01 12:00:00" --to "2024-01-31 23:59:59"
+  python substack_scraper.py --user stephenreid --from 2025-01-01 --to 2025-12-31
+  python substack_scraper.py --urls urls.txt --from "2025-01-01 12:00:00" --to "2025-01-31 23:59:59"
   
 Resume functionality:
   If the script fails halfway through, simply run the same command again.
