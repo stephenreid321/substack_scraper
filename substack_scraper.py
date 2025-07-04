@@ -56,7 +56,7 @@ def retry_with_backoff(func: Callable[[], Any], max_retries: int = DEFAULT_MAX_R
                     return 'Rate limited'
             else:
                 # For other errors, don't retry
-                return f'Error: {str(e)[:50]}'
+                return f'Error: {str(e)}'
     
     return 'Failed after retries'
 
@@ -187,7 +187,7 @@ def get_free_subscriber_count(publication_url: str, max_retries: int = DEFAULT_M
         
         return '0'  # No subscriber count found
     
-    return retry_with_backoff(fetch_subscriber_count, max_retries, f"subscriber count {publication_url[:50]}...")
+    return retry_with_backoff(fetch_subscriber_count, max_retries, f"subscriber count {publication_url}...")
 
 
 def get_post_like_count(post_url: str, max_retries: int = DEFAULT_MAX_RETRIES, original_newsletter_url: str = None) -> str:
@@ -196,34 +196,8 @@ def get_post_like_count(post_url: str, max_retries: int = DEFAULT_MAX_RETRIES, o
         return 'No URL'
     
     def fetch_like_count():
-        actual_post_url = post_url
-        
-        # Handle @username URL redirects if needed
-        if original_newsletter_url and 'substack.com/@' in original_newsletter_url:
-            try:
-                def get_redirected_post_url():
-                    # Extract post ID from the URL
-                    post_id = post_url.split('p-')[-1] if 'p-' in post_url else post_url.split('/')[-1]
-                    username = original_newsletter_url.split('@')[-1]
-                    initial_url = f"https://{username}.substack.com/p/{post_id}"
-
-                    response = requests.get(initial_url, timeout=REQUEST_TIMEOUT, allow_redirects=True)
-                    response.raise_for_status()
-                    
-                    return response.url
-                
-                redirected_url = retry_with_backoff(get_redirected_post_url, DEFAULT_MAX_RETRIES, "post URL redirect")
-                
-                if isinstance(redirected_url, str) and redirected_url.startswith('http'):
-                    actual_post_url = redirected_url
-                else:
-                    return 'Failed to get redirected URL'
-                    
-            except Exception as e:
-                return f'Redirect error: {str(e)[:50]}'
-
         # Initialize Substack Post with the actual URL
-        post = Post(actual_post_url)        
+        post = Post(post_url)        
         
         # Get post metadata which includes like count
         metadata = post.get_metadata()
@@ -233,7 +207,7 @@ def get_post_like_count(post_url: str, max_retries: int = DEFAULT_MAX_RETRIES, o
         
         return str(metadata['reaction_count'])
     
-    return retry_with_backoff(fetch_like_count, max_retries, f"like count {post_url[:50]}...")
+    return retry_with_backoff(fetch_like_count, max_retries, f"like count {post_url}...")
 
 
 def fetch_newsletter_posts(newsletter_url: str, since_date: datetime, max_posts: Optional[int] = None) -> List[Dict]:
@@ -303,7 +277,7 @@ def fetch_newsletter_posts(newsletter_url: str, since_date: datetime, max_posts:
                         continue
                         
                 except Exception as e:
-                    print(f"   ⚠️  Failed to follow redirect for post: {str(e)[:50]}")
+                    print(f"   ⚠️  Failed to follow redirect for post: {str(e)}")
                     continue
 
             try:
@@ -343,8 +317,7 @@ def fetch_newsletter_posts(newsletter_url: str, since_date: datetime, max_posts:
                         'newsletter_url': newsletter_url,
                         'free_subscriber_count': free_subscriber_count,
                         'post_title': post_data.get('title', 'No Title'),
-                        'post_url': post_data.get('canonical_url', ''),
-                        'actual_post_url': post.url if hasattr(post, 'url') else post_data.get('canonical_url', ''),
+                        'post_url': post.url if hasattr(post, 'url') else post_data.get('canonical_url', ''),
                         'post_date': post_date.strftime('%Y-%m-%d %H:%M:%S'),
                         'post_subtitle': post_data.get('subtitle', ''),
                         'author': author_name,
@@ -469,7 +442,7 @@ def save_posts_to_csv(posts: List[Dict], output_file: str):
     # Define CSV fieldnames (added popularity_score)
     fieldnames = [
         'newsletter_name', 'newsletter_url', 'free_subscriber_count', 'post_title', 'post_url', 
-        'actual_post_url', 'post_date', 'post_subtitle', 'author', 'word_count', 'likes', 
+        'post_date', 'post_subtitle', 'author', 'word_count', 'likes', 
         'is_paid', 'post_id', 'popularity_score'
     ]
     
@@ -532,7 +505,7 @@ def sanitize_filename(name: str) -> str:
     sanitized = sanitized.strip('_ ')
     # Limit length to avoid filesystem issues
     if len(sanitized) > 50:
-        sanitized = sanitized[:50].rstrip('_')
+        sanitized = sanitized.rstrip('_')
     return sanitized if sanitized else 'unknown'
 
 
@@ -695,7 +668,7 @@ Resume functionality:
         print(f"\n💾 Saving combined results from all {len(urls)} newsletters...")
         
         # Create combined output filename in substack_posts directory
-        combined_output = os.path.join('substack_posts', "combined.csv")
+        combined_output = os.path.join('combined.csv')
         
         save_posts_to_csv(all_posts, combined_output)
         
