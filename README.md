@@ -118,7 +118,7 @@ The script creates individual CSV files for each newsletter, allowing for robust
 
 For multiple newsletters:
 ```
-substack_posts/
+substacks/
 ├── newsletter1.csv
 ├── newsletter2.csv
 └── newsletter3.csv
