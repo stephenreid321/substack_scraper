@@ -1,6 +1,8 @@
 substack_posts
 posts.csv
 urls.txt
+_urls.txt
 .~lock.*
 .DS_Store
 combined.csv
+_substack_posts

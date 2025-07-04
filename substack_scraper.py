@@ -165,7 +165,7 @@ def get_free_subscriber_count(publication_url: str, max_retries: int = DEFAULT_M
     
     publication_url = normalize_substack_url(publication_url)
     
-    def fetch_subscriber_count():
+    def get_subscriber_count():
         headers = {
             'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
         }
@@ -185,9 +185,9 @@ def get_free_subscriber_count(publication_url: str, max_retries: int = DEFAULT_M
         if magnitude_match:
             return magnitude_match.group(1)
         
-        return '0'  # No subscriber count found
+        return 'UNKNOWN'  # No subscriber count found
     
-    return retry_with_backoff(fetch_subscriber_count, max_retries, f"subscriber count {publication_url}...")
+    return retry_with_backoff(get_subscriber_count, max_retries, f"subscriber count {publication_url}...")
 
 
 def fetch_newsletter_posts(newsletter_url: str, since_date: datetime, max_posts: Optional[int] = None) -> List[Dict]:
@@ -216,10 +216,10 @@ def fetch_newsletter_posts(newsletter_url: str, since_date: datetime, max_posts:
         fetch_limit = max_posts if max_posts else 100
         
         # Add retry mechanism for getting posts (in case of rate limiting)
-        def fetch_posts():
+        def get_posts():
             return newsletter.get_posts(limit=fetch_limit)
         
-        posts = retry_with_backoff(fetch_posts, DEFAULT_MAX_RETRIES, "posts")
+        posts = retry_with_backoff(get_posts, DEFAULT_MAX_RETRIES, "posts")
         
         if isinstance(posts, str):  # Error message from retry_with_backoff
             print(f"   ❌ {posts}")
@@ -290,19 +290,21 @@ def fetch_newsletter_posts(newsletter_url: str, since_date: datetime, max_posts:
                     published_bylines = post_data.get('publishedBylines', [])
                     author_name = newsletter_name  # Default fallback
                     if published_bylines and len(published_bylines) > 0:
-                        author_name = published_bylines[0].get('name', newsletter_name)
+                        author_names = [byline.get('name', '') for byline in published_bylines if byline.get('name')]
+                        author_name = ', '.join(author_names) if author_names else newsletter_name
                     
                     post_info = {
                         'newsletter_name': newsletter_name,
                         'newsletter_url': newsletter_url,
                         'free_subscriber_count': free_subscriber_count,
-                        'post_title': post_data.get('title', 'No Title'),
-                        'post_url': post.url if hasattr(post, 'url') else post_data.get('canonical_url', ''),
-                        'post_date': post_date.strftime('%Y-%m-%d %H:%M:%S'),
-                        'post_subtitle': post_data.get('subtitle', ''),
-                        'author': author_name,
-                        'word_count': post_data.get('wordcount', 0),
                         'likes': post_data.get('reaction_count', 0),
+                        'likes_per_free_subscriber': calculate_likes_per_free_subscriber(post_data.get('reaction_count', 0), free_subscriber_count),
+                        'post_url': post.url if hasattr(post, 'url') else post_data.get('canonical_url', ''),                        
+                        'post_title': post_data.get('title', 'No Title'),
+                        'post_subtitle': post_data.get('subtitle', ''),                        
+                        'post_date': post_date.strftime('%Y-%m-%d %H:%M:%S'),
+                        'author': author_name,
+                        'word_count': post_data.get('wordcount', 0),                        
                         'is_paid': post_data.get('audience', 'everyone') != 'everyone',
                         'post_id': post_data.get('id', ''),
                     }
@@ -330,61 +332,18 @@ def fetch_newsletter_posts(newsletter_url: str, since_date: datetime, max_posts:
         return []
 
 
-def calculate_popularity_score(likes: str, free_subscriber_count: str, post_date: str) -> float:
-    """Calculate popularity score: likes per free subscriber per post age in seconds (scaled for readability)."""
+def calculate_likes_per_free_subscriber(likes: str, free_subscriber_count: str) -> float:
+    
+    if free_subscriber_count == 'UNKNOWN':
+        return 'UNKNOWN'
+        
+    subscriber_count = free_subscriber_count.replace(',', '')
     try:
-        # Parse likes
-        if likes in ['No URL', 'Rate limited', 'Skipped', 'Failed after retries'] or likes.startswith('Error:'):
-            return 0.0
+        subscriber_num = float(subscriber_count)
+    except (ValueError, TypeError):
+        raise ValueError(f"Invalid subscriber count: {subscriber_count}")
         
-        try:
-            likes_num = float(likes)
-        except (ValueError, TypeError):
-            return 0.0
-        
-        # Parse free subscriber count
-        if free_subscriber_count in ['No URL', 'Rate limited', 'Failed after retries'] or free_subscriber_count.startswith('Error:'):
-            return 0.0
-        
-        # Handle subscriber count formats (could be "1000", "1K", "10K", etc.)
-        subscriber_count = free_subscriber_count.replace(',', '')
-        if subscriber_count.endswith('K'):
-            subscriber_num = float(subscriber_count[:-1]) * 1000
-        elif subscriber_count.endswith('M'):
-            subscriber_num = float(subscriber_count[:-1]) * 1000000
-        else:
-            try:
-                subscriber_num = float(subscriber_count)
-            except (ValueError, TypeError):
-                return 0.0
-        
-        # Avoid division by zero
-        if subscriber_num == 0:
-            return 0.0
-        
-        # Calculate post age in seconds using the flexible parser
-        post_datetime = parse_datetime(post_date)
-        if not post_datetime:
-            return 0.0
-        
-        now = datetime.now(timezone.utc)
-        post_age_seconds = (now - post_datetime).total_seconds()
-        
-        # Avoid division by zero or negative age
-        if post_age_seconds <= 0:
-            return 0.0
-        
-        # Calculate popularity score: likes per subscriber per second
-        raw_score = likes_num / (subscriber_num * post_age_seconds)
-        
-        # Scale the score to make it more readable (multiply by 1 billion and round to 2 decimal places)
-        # This converts something like 3.18e-08 to 31.83
-        scaled_score = raw_score * 1_000_000_000
-        
-        return round(scaled_score, 2)
-        
-    except Exception:
-        return 0.0
+    return round(100 * (likes / subscriber_num), 2)
 
 
 def save_posts_to_csv(posts: List[Dict], output_file: str):
@@ -395,21 +354,13 @@ def save_posts_to_csv(posts: List[Dict], output_file: str):
         print("📝 Creating empty CSV file (no posts to save)...")
     else:
         print(f"💾 Writing {len(posts)} posts to CSV...")
-        
-        # Calculate popularity scores for all posts
-        print("📊 Calculating popularity scores...")
-        for post in posts:
-            post['popularity_score'] = calculate_popularity_score(
-                str(post['likes']), 
-                post['free_subscriber_count'], 
-                post['post_date']
-            )
-    
-    # Define CSV fieldnames (added popularity_score)
+            
     fieldnames = [
-        'newsletter_name', 'newsletter_url', 'free_subscriber_count', 'post_title', 'post_url', 
-        'post_date', 'post_subtitle', 'author', 'word_count', 'likes', 
-        'is_paid', 'post_id', 'popularity_score'
+        'newsletter_name', 'newsletter_url', 'free_subscriber_count',
+        'likes', 'likes_per_free_subscriber',
+        'post_url', 'post_title', 'post_subtitle', 'post_date',
+        'author', 'word_count',  
+        'is_paid', 'post_id'
     ]
     
     # Write posts to CSV file (or create empty file with headers)
@@ -526,8 +477,6 @@ Resume functionality:
                        help='Output file name (default: posts.csv)')
     parser.add_argument('--max-posts', type=int, default=None,
                        help='Maximum number of posts per newsletter')
-    parser.add_argument('--skip-likes', action='store_true',
-                       help='Skip fetching like counts (faster but less data)')
     parser.add_argument('--force-rescrape', action='store_true',
                        help='Force re-scraping of all newsletters, even if CSV files exist')
     
@@ -591,16 +540,7 @@ Resume functionality:
                 print(f"   📝 No posts found for this newsletter - creating empty file to mark as processed")
             else:
                 print(f"   ✅ Found {len(posts)} posts")
-                
-                # Fetch like counts for this newsletter's posts if not skipped
-                if not args.skip_likes:
-                    print(f"   👍 Fetching like counts for {len(posts)} posts...")
-                    posts = add_like_counts_to_posts(posts, url)
-                else:
-                    print(f"   ⏭️  Skipping like count fetching (--skip-likes flag used)")
-                    for post in posts:
-                        post['likes'] = 'Skipped'
-            
+                            
             # Add to total collection (even if empty, for tracking)
             all_posts.extend(posts)
             processed_newsletters.append(url)
