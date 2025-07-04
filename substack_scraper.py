@@ -351,6 +351,12 @@ def fetch_newsletter_posts(newsletter_url: str, from_date: datetime, to_date: da
         if max_posts and len(filtered_posts) < max_posts:
             print(f"   ℹ️  Only found {len(filtered_posts)} posts in time window {from_date.strftime('%Y-%m-%d')} to {to_date.strftime('%Y-%m-%d')}")
         
+        # Check if we hit the max_posts limit exactly - this might indicate more posts are available
+        if max_posts and len(filtered_posts) == max_posts:
+            error_msg = f"⚠️  Hit max_posts limit ({max_posts}) - there may be more posts available. Consider increasing --max-posts or narrowing the date range."
+            print(f"   ❌ {error_msg}")
+            raise ValueError(error_msg)
+        
         return filtered_posts
         
     except Exception as e:
