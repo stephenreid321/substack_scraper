@@ -661,7 +661,6 @@ Resume functionality:
     if len(urls) > 1:
         print(f"\n💾 Saving combined results from all {len(urls)} newsletters...")
         
-        # Create combined output filename in substacks directory
         combined_output = os.path.join('combined.csv')
         
         save_posts_to_csv(all_posts, combined_output)

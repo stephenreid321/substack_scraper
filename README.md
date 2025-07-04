@@ -195,5 +195,93 @@ python substack_scraper.py --user stephenreid --from 2024-01-01 --to 2024-12-31
 
 *Generated example files in `/example` with:*
 ```bash
-python substack_scraper.py --urls urls.txt --from 2025-06-01 --to 2025-06-30
+python substack_scraper.py --urls example/urls.txt --from 2025-06-01 --to 2025-06-30
+📊 Default max posts set to 33 (1 per day since 2025-06-01)
+🔗 Processing 4 newsletter(s)...
+
+📰 Processing newsletter 1/4: https://emergelakefront.substack.com/
+📰 Fetching posts from: https://emergelakefront.substack.com
+   👥 Fetching subscriber count...
+   👥 Free subscribers: 22
+   📄 Fetching posts...
+   📄 Retrieved 8 posts, filtering by date window...
+Filtering posts:   0%|                                                                   | 0/8 [00:00<?, ?post/s]🔍 Post metadata: A New Season at Lakefront 🌼
+Filtering posts:  12%|███████▍                                                   | 1/8 [00:00<00:03,  2.23post/s]🔍 Post metadata: Lakefront Community Kick-off: A Global Gathering at the Edge of the Future 🌍
+Filtering posts:  25%|██████████████▊                                            | 2/8 [00:00<00:01,  3.16post/s]🔍 Post metadata: "Fika with Dan Siegel" at Lakefront
+   ⏹️  Reached post older than 2025-06-01 (post date: 2025-05-21), stopping...
+Filtering posts:  25%|██████████████▊                                            | 2/8 [00:00<00:02,  2.27post/s]
+   ℹ️  Only found 2 posts in time window 2025-06-01 to 2025-06-30
+   ✅ Found 2 posts
+   💾 Saving results for this newsletter...
+💾 Writing 2 posts to CSV...
+Writing CSV: 100%|█████████████████████████████████████████████████████████████| 2/2 [00:00<00:00, 20020.54row/s]
+✅ Successfully saved 2 posts to: substacks/emergelakefront.csv
+   ✅ Saved 2 posts to: substacks/emergelakefront.csv
+
+📰 Processing newsletter 2/4: https://substack.com/@tuckerwalsh
+📰 Fetching posts from: https://tuckerwalsh.substack.com
+   👥 Fetching subscriber count...
+   👥 Free subscribers: 182
+   📄 Fetching posts...
+   📄 Retrieved 33 posts, filtering by date window...
+Filtering posts:   0%|                                                                  | 0/33 [00:00<?, ?post/s]🔍 Post metadata: Deep AF Green
+Filtering posts:   3%|█▊                                                        | 1/33 [00:00<00:14,  2.18post/s]🔍 Post metadata: A Vow to Soul
+   ⏹️  Reached post older than 2025-06-01 (post date: 2025-04-22), stopping...
+Filtering posts:   3%|█▊                                                        | 1/33 [00:00<00:30,  1.05post/s]
+   ℹ️  Only found 1 posts in time window 2025-06-01 to 2025-06-30
+   ✅ Found 1 posts
+   💾 Saving results for this newsletter...
+💾 Writing 1 posts to CSV...
+Writing CSV: 100%|█████████████████████████████████████████████████████████████| 1/1 [00:00<00:00, 28728.11row/s]
+✅ Successfully saved 1 posts to: substacks/tuckerwalsh.csv
+   ✅ Saved 1 posts to: substacks/tuckerwalsh.csv
+
+📰 Processing newsletter 3/4: https://octopusyarn.substack.com/
+📰 Fetching posts from: https://octopusyarn.substack.com
+   👥 Fetching subscriber count...
+   👥 Free subscribers: UNKNOWN
+   📄 Fetching posts...
+   📄 Retrieved 23 posts, filtering by date window...
+Filtering posts:   0%|                                                                  | 0/23 [00:00<?, ?post/s]🔍 Post metadata: Why Privacy makes us Human
+Filtering posts:   4%|██▌                                                       | 1/23 [00:00<00:05,  4.04post/s]🔍 Post metadata: Technology is Re-Enchanting the World
+   ⏹️  Reached post older than 2025-06-01 (post date: 2025-04-12), stopping...
+Filtering posts:   4%|██▌                                                       | 1/23 [00:00<00:10,  2.06post/s]
+   ℹ️  Only found 1 posts in time window 2025-06-01 to 2025-06-30
+   ✅ Found 1 posts
+   💾 Saving results for this newsletter...
+💾 Writing 1 posts to CSV...
+Writing CSV: 100%|██████████████████████████████████████████████████████████████| 1/1 [00:00<00:00, 5184.55row/s]
+✅ Successfully saved 1 posts to: substacks/octopusyarn.csv
+   ✅ Saved 1 posts to: substacks/octopusyarn.csv
+
+📰 Processing newsletter 4/4: https://stephenreid.substack.com/
+📰 Fetching posts from: https://stephenreid.substack.com
+   👥 Fetching subscriber count...
+   👥 Free subscribers: 3,000
+   📄 Fetching posts...
+   📄 Retrieved 33 posts, filtering by date window...
+Filtering posts:   0%|                                                                  | 0/33 [00:00<?, ?post/s]🔍 Post metadata: Introducing Hilma Church-Turing
+Filtering posts:   3%|█▊                                                        | 1/33 [00:00<00:07,  4.04post/s]🔍 Post metadata: In Correspondence #49
+Filtering posts:   6%|███▌                                                      | 2/33 [00:00<00:07,  4.40post/s]🔍 Post metadata: Four reasons to join us at Emerge Lakefront
+   ⏹️  Reached post older than 2025-06-01 (post date: 2025-05-24), stopping...
+Filtering posts:   6%|███▌                                                      | 2/33 [00:00<00:11,  2.77post/s]
+   ℹ️  Only found 2 posts in time window 2025-06-01 to 2025-06-30
+   ✅ Found 2 posts
+   💾 Saving results for this newsletter...
+💾 Writing 2 posts to CSV...
+Writing CSV: 100%|█████████████████████████████████████████████████████████████| 2/2 [00:00<00:00, 25653.24row/s]
+✅ Successfully saved 2 posts to: substacks/stephenreid.csv
+   ✅ Saved 2 posts to: substacks/stephenreid.csv
+
+💾 Saving combined results from all 4 newsletters...
+💾 Writing 6 posts to CSV...
+Writing CSV: 100%|█████████████████████████████████████████████████████████████| 6/6 [00:00<00:00, 40265.32row/s]
+✅ Successfully saved 6 posts to: combined.csv
+✅ Saved combined results: combined.csv
+
+🎉 Completed! Processed 6 posts total.
+📊 Newly processed newsletters: 4
+📊 Individual newsletter files saved after each processing step
+📊 Combined results also saved for all newsletters
+🚀 All newsletters were freshly processed
 ```
