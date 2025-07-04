@@ -382,8 +382,8 @@ def check_existing_newsletter_file(url: str) -> Optional[str]:
     newsletter_name = extract_newsletter_name_from_url(url)
     newsletter_name_safe = sanitize_filename(newsletter_name)
     
-    # Check for individual newsletter file in substack_posts directory
-    expected_filename = os.path.join('substack_posts', f"{newsletter_name_safe}.csv")
+    # Check for individual newsletter file in substacks directory
+    expected_filename = os.path.join('substacks', f"{newsletter_name_safe}.csv")
     
     # Also check the original filename (in case it's a single newsletter run)
     possible_files = [expected_filename]
@@ -642,8 +642,8 @@ Resume functionality:
                 newsletter_name = extract_newsletter_name_from_url(url)
                 newsletter_name_safe = sanitize_filename(newsletter_name)
                 
-                # Create filename in substack_posts directory
-                individual_output = os.path.join('substack_posts', f"{newsletter_name_safe}.csv")
+                # Create filename in substacks directory
+                individual_output = os.path.join('substacks', f"{newsletter_name_safe}.csv")
             else:
                 # For single newsletter, use original filename in root directory
                 individual_output = args.output
@@ -661,7 +661,7 @@ Resume functionality:
     if len(urls) > 1:
         print(f"\n💾 Saving combined results from all {len(urls)} newsletters...")
         
-        # Create combined output filename in substack_posts directory
+        # Create combined output filename in substacks directory
         combined_output = os.path.join('combined.csv')
         
         save_posts_to_csv(all_posts, combined_output)
