@@ -5,6 +5,7 @@ A Python script that fetches Substack newsletter posts published within a specif
 ## Features ✨
 
 - **Flexible Input Options**: Single URL, file with multiple URLs, or Substack profile username
+- **Category Support**: Tab-separated format for organizing newsletters by category
 - **Time Window Filtering**: Fetch posts only within specified date ranges
 - **Resume Functionality**: Automatically skips already-scraped newsletters if the script fails
 - **Rate Limiting Protection**: Built-in exponential backoff for API rate limits
@@ -57,7 +58,7 @@ python substack_scraper.py --urls urls.txt --from 2025-01-01 --to 2025-12-31 --f
 ### Required Arguments
 - `--url` OR `--urls` OR `--user`: Input source (mutually exclusive)
   - `--url`: Single Substack newsletter URL
-  - `--urls`: File containing URLs (one per line)
+  - `--urls`: File containing URLs (one per line, or tab-separated URL<TAB>CATEGORY format)
   - `--user`: Substack profile username (e.g., `stephenreid` or `@stephenreid`)
 - `--from`: Start date (YYYY-MM-DD)
 - `--to`: End date (YYYY-MM-DD)
@@ -69,8 +70,9 @@ python substack_scraper.py --urls urls.txt --from 2025-01-01 --to 2025-12-31 --f
 
 ## Input File Format 📄
 
-For `--urls`, create a text file with one URL per line:
+For `--urls`, create a text file with URLs in one of these formats:
 
+### Simple Format (one URL per line):
 ```
 https://newsletter1.substack.com
 https://newsletter2.substack.com
@@ -78,6 +80,14 @@ https://custom-domain.com
 # Comments start with #
 https://newsletter3.substack.com
 ```
+
+### Tab-Separated Format (URL + Category):
+```
+https://newsletter1.substack.com economics
+https://newsletter2.substack.com philosophy
+```
+
+**Note**: Use actual tab characters (not spaces) to separate URL and category in the tab-separated format.
 
 ## Output Format 📊
 
@@ -87,6 +97,7 @@ The script generates CSV files with the following columns:
 |--------|-------------|
 | `newsletter_name` | Name extracted from URL |
 | `newsletter_url` | Normalized newsletter URL |
+| `category` | Category from tab-separated input (empty if not specified) |
 | `free_subscriber_count` | Number of free subscribers |
 | `likes` | Post reaction/like count |
 | `likes_per_free_subscriber` | Engagement rate (likes per 100 subscribers) |
@@ -137,10 +148,10 @@ posts.csv (or your specified filename)
 
 ### Example 1: Single Newsletter
 ```bash
-python substack_scraper.py --url https://platformer.news --from 2025-06-01 --to 2025-06-30
+python substack_scraper.py --url https://newsletter1.substack.com --from 2025-06-01 --to 2025-06-30
 ```
 
-### Example 2: Multiple Newsletters
+### Example 2: Multiple Newsletters (Simple Format)
 Create `urls.txt`:
 ```
 https://newsletter1.substack.com
@@ -153,7 +164,19 @@ Run:
 python substack_scraper.py --urls urls.txt --from 2025-01-01 --to 2025-12-31
 ```
 
-### Example 3: From Profile
+### Example 3: Multiple Newsletters with Categories
+Create `urls.txt` with tab-separated format:
+```
+https://newsletter1.substack.com economics
+https://newsletter2.substack.com philosophy
+```
+
+Run:
+```bash
+python substack_scraper.py --urls urls.txt --from 2025-01-01 --to 2025-12-31
+```
+
+### Example 4: From Profile
 ```bash
 python substack_scraper.py --user stephenreid --from 2025-01-01 --to 2025-12-31
 ```

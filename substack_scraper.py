@@ -8,6 +8,15 @@ published within a specified time window, along with their like counts and metad
 The script includes resume functionality - if it fails halfway through, it will
 skip newsletters that have already been scraped (by checking for existing CSV files).
 
+URL File Format:
+The --urls file can be either:
+1. One URL per line (simple format)
+2. Tab-separated format with URL and category: URL<TAB>CATEGORY
+
+Example urls.txt with categories:
+https://newsletter1.substack.com economics
+https://newsletter2.substack.com philosophy
+
 Usage:
     python substack_scraper.py --urls urls.txt --from 2025-01-01 --to 2025-12-31 --output posts.csv
     python substack_scraper.py --url https://example.substack.com --from 2025-01-01 --to 2025-12-31
@@ -116,8 +125,8 @@ def calculate_default_max_posts(from_date: datetime, to_date: datetime) -> int:
     return max(1, min(days_since, 365))  # Between 1 and 365 days
 
 
-def load_urls_from_file(file_path: str) -> List[str]:
-    """Load Substack URLs from a text file (one URL per line)."""
+def load_urls_from_file(file_path: str) -> List[Dict[str, str]]:
+    """Load Substack URLs from a text file. Supports both single URLs and tab-separated URL+category format."""
     urls = []
     
     if not os.path.exists(file_path):
@@ -128,11 +137,26 @@ def load_urls_from_file(file_path: str) -> List[str]:
         for line_num, line in enumerate(f, 1):
             line = line.strip()
             if line and not line.startswith('#'):  # Skip empty lines and comments
-                # Basic URL validation
-                if line.startswith(('http://', 'https://')):
-                    urls.append(line)
+                # Check if line contains tab-separated values
+                if '\t' in line:
+                    parts = line.split('\t')
+                    if len(parts) >= 2:
+                        url = parts[0].strip()
+                        category = parts[1].strip()
+                        
+                        # Basic URL validation
+                        if url.startswith(('http://', 'https://')):
+                            urls.append({'url': url, 'category': category})
+                        else:
+                            print(f"⚠️  Line {line_num}: Invalid URL format: {url}")
+                    else:
+                        print(f"⚠️  Line {line_num}: Invalid tab-separated format: {line}")
                 else:
-                    print(f"⚠️  Line {line_num}: Invalid URL format: {line}")
+                    # Single URL format (backward compatibility)
+                    if line.startswith(('http://', 'https://')):
+                        urls.append({'url': line, 'category': ''})
+                    else:
+                        print(f"⚠️  Line {line_num}: Invalid URL format: {line}")
     
     return urls
 
@@ -188,7 +212,7 @@ def get_free_subscriber_count(publication_url: str, max_retries: int = DEFAULT_M
     return retry_with_backoff(get_subscriber_count, max_retries, f"subscriber count {publication_url}...")
 
 
-def fetch_newsletter_posts(newsletter_url: str, from_date: datetime, to_date: datetime, max_posts: Optional[int] = None) -> List[Dict]:
+def fetch_newsletter_posts(newsletter_url: str, from_date: datetime, to_date: datetime, max_posts: Optional[int] = None, category: str = '') -> List[Dict]:
     """Fetch all posts from a newsletter published within the specified time window."""
     try:
         original_newsletter_url = newsletter_url
@@ -297,14 +321,15 @@ def fetch_newsletter_posts(newsletter_url: str, from_date: datetime, to_date: da
                     post_info = {
                         'newsletter_name': newsletter_name,
                         'newsletter_url': newsletter_url,
+                        'category': category,
                         'free_subscriber_count': free_subscriber_count,
                         'likes': post_data.get('reaction_count', 0),
                         'likes_per_free_subscriber': calculate_likes_per_free_subscriber(post_data.get('reaction_count', 0), free_subscriber_count),
                         'post_url': post.url if hasattr(post, 'url') else post_data.get('canonical_url', ''),                        
+                        'author': author_name,                        
                         'post_title': post_data.get('title', 'No Title'),
                         'post_subtitle': post_data.get('subtitle', ''),                        
                         'post_date': post_date.strftime('%Y-%m-%d %H:%M:%S'),
-                        'author': author_name,
                         'word_count': post_data.get('wordcount', 0),                        
                         'is_paid': post_data.get('audience', 'everyone') != 'everyone',
                         'post_id': post_data.get('id', ''),
@@ -357,11 +382,10 @@ def save_posts_to_csv(posts: List[Dict], output_file: str):
         print(f"💾 Writing {len(posts)} posts to CSV...")
             
     fieldnames = [
-        'newsletter_name', 'newsletter_url', 'free_subscriber_count',
+        'newsletter_name', 'newsletter_url', 'category', 'free_subscriber_count',
         'likes', 'likes_per_free_subscriber',
-        'post_url', 'post_title', 'post_subtitle', 'post_date',
-        'author', 'word_count',  
-        'is_paid', 'post_id'
+        'post_url', 'author', 'post_title', 'post_subtitle', 'post_date',
+        'word_count', 'is_paid', 'post_id'
     ]
     
     # Write posts to CSV file (or create empty file with headers)
@@ -541,7 +565,7 @@ Resume functionality:
     # URL input options (mutually exclusive)
     url_group = parser.add_mutually_exclusive_group(required=True)
     url_group.add_argument('--url', type=str, help='Single Substack newsletter URL')
-    url_group.add_argument('--urls', type=str, help='File containing Substack URLs (one per line)')
+    url_group.add_argument('--urls', type=str, help='File containing Substack URLs (one per line, or tab-separated URL<TAB>CATEGORY format)')
     url_group.add_argument('--user', type=str, help='Substack profile username (e.g., stephenreid or @stephenreid)')
     
     # Required arguments
@@ -581,12 +605,13 @@ Resume functionality:
     
     # Get list of URLs
     if args.url:
-        urls = [args.url]
+        urls = [{'url': args.url, 'category': ''}]
     elif args.user:
         # Handle profile username - add @ if not present and construct full URL
         username = args.user.lstrip('@')  # Remove @ if present
         profile_url = f"https://substack.com/@{username}"
-        urls = get_newsletters_from_profile(profile_url)
+        newsletter_urls = get_newsletters_from_profile(profile_url)
+        urls = [{'url': url, 'category': ''} for url in newsletter_urls]
     else:
         urls = load_urls_from_file(args.urls)
         if not urls:
@@ -603,8 +628,11 @@ Resume functionality:
     processed_newsletters = []
     
     # Process each newsletter individually
-    for i, url in enumerate(urls, 1):
-        print(f"\n📰 Processing newsletter {i}/{len(urls)}: {url}")
+    for i, url_data in enumerate(urls, 1):
+        url = url_data['url']
+        category = url_data['category']
+        category_display = f" ({category})" if category else ""
+        print(f"\n📰 Processing newsletter {i}/{len(urls)}: {url}{category_display}")
         
         # Check if this newsletter was already scraped (unless force-rescrape is enabled)
         if not args.force_rescrape:
@@ -616,13 +644,18 @@ Resume functionality:
                 # Load existing data
                 existing_posts = load_existing_posts_from_csv(existing_file)
                 
+                # Update category in existing posts if it wasn't set before
+                for post in existing_posts:
+                    if not post.get('category') and category:
+                        post['category'] = category
+                
                 # Add to collections regardless of whether there are posts (empty files are valid)
                 all_posts.extend(existing_posts)
                 skipped_newsletters.append(url)
                 continue
         
         try:
-            posts = fetch_newsletter_posts(url, from_date, to_date, args.max_posts)
+            posts = fetch_newsletter_posts(url, from_date, to_date, args.max_posts, category)
             
             if not posts:
                 print(f"   📝 No posts found for this newsletter - creating empty file to mark as processed")
