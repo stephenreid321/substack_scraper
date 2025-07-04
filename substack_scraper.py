@@ -3,14 +3,14 @@
 Substack Post Scraper
 
 This script takes a list of Substack newsletter URLs and fetches all posts 
-published since a specified date, along with their like counts and metadata.
+published within a specified time window, along with their like counts and metadata.
 
 The script includes resume functionality - if it fails halfway through, it will
 skip newsletters that have already been scraped (by checking for existing CSV files).
 
 Usage:
-    python substack_scraper.py --urls urls.txt --since 2024-01-01 --output posts.csv
-    python substack_scraper.py --url https://example.substack.com --since 2024-01-01
+    python substack_scraper.py --urls urls.txt --from 2024-01-01 --to 2024-12-31 --output posts.csv
+    python substack_scraper.py --url https://example.substack.com --from 2024-01-01 --to 2024-12-31
 """
 
 import os
@@ -20,7 +20,7 @@ import time
 import re
 import requests
 import sys
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from urllib.parse import urlparse
 from tqdm import tqdm
 from typing import List, Dict, Optional, Callable, Any
@@ -109,11 +109,10 @@ def parse_datetime(date_str: str, raise_on_error: bool = False) -> Optional[date
         raise ValueError(f"Unable to parse date: {date_str}")
     return None
 
-
-def calculate_default_max_posts(since_date: datetime) -> int:
-    """Calculate default max posts based on days since the specified date (1 post per day)."""
+def calculate_default_max_posts(from_date: datetime, to_date: datetime) -> int:
+    """Calculate default max posts based on days since the from date (1 post per day)."""
     now = datetime.now(timezone.utc)
-    days_since = (now - since_date).days
+    days_since = (now - from_date).days
     # Ensure at least 1 day and cap at a reasonable maximum
     return max(1, min(days_since, 365))  # Between 1 and 365 days
 
@@ -190,8 +189,8 @@ def get_free_subscriber_count(publication_url: str, max_retries: int = DEFAULT_M
     return retry_with_backoff(get_subscriber_count, max_retries, f"subscriber count {publication_url}...")
 
 
-def fetch_newsletter_posts(newsletter_url: str, since_date: datetime, max_posts: Optional[int] = None) -> List[Dict]:
-    """Fetch all posts from a newsletter published since the specified date."""
+def fetch_newsletter_posts(newsletter_url: str, from_date: datetime, to_date: datetime, max_posts: Optional[int] = None) -> List[Dict]:
+    """Fetch all posts from a newsletter published within the specified time window."""
     try:
         original_newsletter_url = newsletter_url
         newsletter_url = normalize_substack_url(newsletter_url)
@@ -229,7 +228,10 @@ def fetch_newsletter_posts(newsletter_url: str, since_date: datetime, max_posts:
             print("   ⚠️  No posts found (empty list returned)")
             return []
         
-        print(f"   📄 Retrieved {len(posts)} posts, filtering by date...")
+        print(f"   📄 Retrieved {len(posts)} posts, filtering by date window...")
+        
+        # Make to_date inclusive by adding one day
+        to_date_inclusive = to_date + timedelta(days=1)
         
         filtered_posts = []
         for post in tqdm(posts, desc="Filtering posts", unit="post"):
@@ -284,8 +286,8 @@ def fetch_newsletter_posts(newsletter_url: str, since_date: datetime, max_posts:
                     print(f"   ⚠️  Could not parse date '{post_date_str}' for post: {post_data.get('title', 'Unknown')}")
                     continue
                 
-                # Check if post is since (after or equal to) the specified date
-                if post_date >= since_date:
+                # Check if post is within the specified time window (to_date is now inclusive)
+                if from_date <= post_date < to_date_inclusive:
                     # Safely extract author name
                     published_bylines = post_data.get('publishedBylines', [])
                     author_name = newsletter_name  # Default fallback
@@ -313,9 +315,9 @@ def fetch_newsletter_posts(newsletter_url: str, since_date: datetime, max_posts:
                     # Check if we have enough posts
                     if max_posts and len(filtered_posts) >= max_posts:
                         break
-                else:
-                    # Post is older than since_date, stop fetching since posts are chronological
-                    print(f"   ⏹️  Reached post older than {since_date.strftime('%Y-%m-%d')} (post date: {post_date.strftime('%Y-%m-%d')}), stopping...")
+                elif post_date < from_date:
+                    # Post is older than from_date, stop fetching since posts are chronological
+                    print(f"   ⏹️  Reached post older than {from_date.strftime('%Y-%m-%d')} (post date: {post_date.strftime('%Y-%m-%d')}), stopping...")
                     break
             
             except Exception as e:
@@ -323,7 +325,7 @@ def fetch_newsletter_posts(newsletter_url: str, since_date: datetime, max_posts:
                 continue
         
         if max_posts and len(filtered_posts) < max_posts:
-            print(f"   ℹ️  Only found {len(filtered_posts)} posts since {since_date.strftime('%Y-%m-%d')}")
+            print(f"   ℹ️  Only found {len(filtered_posts)} posts in time window {from_date.strftime('%Y-%m-%d')} to {to_date.strftime('%Y-%m-%d')}")
         
         return filtered_posts
         
@@ -449,13 +451,13 @@ def extract_newsletter_name_from_url(url: str) -> str:
 
 def main():
     parser = argparse.ArgumentParser(
-        description='Fetch Substack posts published since a certain date with like counts',
+        description='Fetch Substack posts published within a time window with like counts',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  python substack_scraper.py --url https://example.substack.com --since 2024-01-01
-  python substack_scraper.py --urls newsletters.txt --since 2023-12-31 --output posts.csv
-  python substack_scraper.py --urls urls.txt --since "2024-01-01 12:00:00"
+  python substack_scraper.py --url https://example.substack.com --from 2024-01-01 --to 2024-12-31
+  python substack_scraper.py --urls newsletters.txt --from 2023-12-01 --to 2023-12-31 --output posts.csv
+  python substack_scraper.py --urls urls.txt --from "2024-01-01 12:00:00" --to "2024-01-31 23:59:59"
   
 Resume functionality:
   If the script fails halfway through, simply run the same command again.
@@ -469,8 +471,10 @@ Resume functionality:
     url_group.add_argument('--urls', type=str, help='File containing Substack URLs (one per line)')
     
     # Required arguments
-    parser.add_argument('--since', type=str, required=True, 
-                       help='Fetch posts published since this date (YYYY-MM-DD or YYYY-MM-DD HH:MM:SS)')
+    parser.add_argument('--from', type=str, required=True, dest='from_date',
+                       help='Start date for time window (YYYY-MM-DD or YYYY-MM-DD HH:MM:SS)')
+    parser.add_argument('--to', type=str, required=True, dest='to_date',
+                       help='End date for time window (YYYY-MM-DD or YYYY-MM-DD HH:MM:SS)')
     
     # Optional arguments
     parser.add_argument('--output', type=str, default='posts.csv', 
@@ -482,18 +486,25 @@ Resume functionality:
     
     args = parser.parse_args()
     
-    # Parse the since date
+    # Parse the from and to dates
     try:
-        since_date = parse_datetime(args.since, raise_on_error=True)
-        print(f"📅 Fetching posts published since: {since_date.strftime('%Y-%m-%d %H:%M:%S UTC')}")
+        from_date = parse_datetime(args.from_date, raise_on_error=True)
+        to_date = parse_datetime(args.to_date, raise_on_error=True)
+        
+        # Validate date range
+        if from_date >= to_date:
+            raise ValueError("From date must be earlier than to date")
+        
+        print(f"📅 Fetching posts published from: {from_date.strftime('%Y-%m-%d %H:%M:%S UTC')}")
+        print(f"📅 To: {to_date.strftime('%Y-%m-%d %H:%M:%S UTC')}")
     except ValueError as e:
         print(f"❌ {e}")
         return
     
-    # Calculate default max posts based on days since the specified date
+    # Calculate default max posts based on days in the time window
     if args.max_posts is None:
-        default_max_posts = calculate_default_max_posts(since_date)
-        print(f"📊 Default max posts set to {default_max_posts} (1 per day since {since_date.strftime('%Y-%m-%d')})")
+        default_max_posts = calculate_default_max_posts(from_date, to_date)
+        print(f"📊 Default max posts set to {default_max_posts} (1 per day since {from_date.strftime('%Y-%m-%d')})")
         args.max_posts = default_max_posts
     
     # Get list of URLs
@@ -534,7 +545,7 @@ Resume functionality:
                 continue
         
         try:
-            posts = fetch_newsletter_posts(url, since_date, args.max_posts)
+            posts = fetch_newsletter_posts(url, from_date, to_date, args.max_posts)
             
             if not posts:
                 print(f"   📝 No posts found for this newsletter - creating empty file to mark as processed")
