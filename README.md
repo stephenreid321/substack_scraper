@@ -27,29 +27,29 @@ A Python script that fetches Substack newsletter posts published within a specif
 
 **Single Newsletter:**
 ```bash
-python substack_scraper.py --url https://example.substack.com --from 2024-01-01 --to 2024-12-31
+python substack_scraper.py --url https://example.substack.com --from 2025-01-01 --to 2025-12-31
 ```
 
 **Multiple Newsletters from File:**
 ```bash
-python substack_scraper.py --urls newsletters.txt --from 2024-01-01 --to 2024-12-31 --output posts.csv
+python substack_scraper.py --urls newsletters.txt --from 2025-01-01 --to 2025-12-31 --output posts.csv
 ```
 
 **From Substack Profile:**
 ```bash
-python substack_scraper.py --user stephenreid --from 2024-01-01 --to 2024-12-31
+python substack_scraper.py --user stephenreid --from 2025-01-01 --to 2025-12-31
 ```
 
 ### Advanced Usage
 
 **Limit Posts Per Newsletter:**
 ```bash
-python substack_scraper.py --url https://example.substack.com --from 2024-01-01 --to 2024-12-31 --max-posts 50
+python substack_scraper.py --url https://example.substack.com --from 2025-01-01 --to 2025-12-31 --max-posts 50
 ```
 
 **Force Re-scraping:**
 ```bash
-python substack_scraper.py --urls urls.txt --from 2024-01-01 --to 2024-12-31 --force-rescrape
+python substack_scraper.py --urls urls.txt --from 2025-01-01 --to 2025-12-31 --force-rescrape
 ```
 
 ## Command Line Arguments 🔧
@@ -137,7 +137,7 @@ posts.csv (or your specified filename)
 
 ### Example 1: Single Newsletter
 ```bash
-python substack_scraper.py --url https://platformer.news --from 2024-06-01 --to 2024-06-30
+python substack_scraper.py --url https://platformer.news --from 2025-06-01 --to 2025-06-30
 ```
 
 ### Example 2: Multiple Newsletters
@@ -150,12 +150,12 @@ https://custom-domain.com
 
 Run:
 ```bash
-python substack_scraper.py --urls urls.txt --from 2024-01-01 --to 2024-12-31
+python substack_scraper.py --urls urls.txt --from 2025-01-01 --to 2025-12-31
 ```
 
 ### Example 3: From Profile
 ```bash
-python substack_scraper.py --user stephenreid --from 2024-01-01 --to 2024-12-31
+python substack_scraper.py --user stephenreid --from 2025-01-01 --to 2025-12-31
 ```
 
 ## Supported URL Formats 🔗
