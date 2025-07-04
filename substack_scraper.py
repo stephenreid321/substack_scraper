@@ -11,6 +11,7 @@ skip newsletters that have already been scraped (by checking for existing CSV fi
 Usage:
     python substack_scraper.py --urls urls.txt --from 2024-01-01 --to 2024-12-31 --output posts.csv
     python substack_scraper.py --url https://example.substack.com --from 2024-01-01 --to 2024-12-31
+    python substack_scraper.py --user stephenreid --from 2024-01-01 --to 2024-12-31
 """
 
 import os
@@ -20,6 +21,7 @@ import time
 import re
 import requests
 import sys
+import json
 from datetime import datetime, timezone, timedelta
 from urllib.parse import urlparse
 from tqdm import tqdm
@@ -449,6 +451,88 @@ def extract_newsletter_name_from_url(url: str) -> str:
         return 'unknown'
 
 
+def get_newsletters_from_profile(profile_url: str) -> List[str]:
+    """Extract newsletter URLs from a Substack profile page."""
+    try:
+        print(f"📋 Fetching newsletters from profile: {profile_url}")
+        
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+        }
+        
+        response = requests.get(profile_url, headers=headers, timeout=REQUEST_TIMEOUT)
+        response.raise_for_status()
+        
+        content = response.text
+        
+        # Look for the window._preloads JSON data
+        # First, let's try to find any window._preloads pattern for debugging
+        debug_match = re.search(r'window\._preloads.*?JSON\.parse', content, re.DOTALL)
+        if debug_match:
+            print(f"   🔍 Found window._preloads pattern: {debug_match.group()[:100]}...")
+        
+        # More flexible regex to handle various whitespace patterns and escaped quotes
+        # The JSON string can contain escaped quotes and span multiple lines
+        preloads_match = re.search(r'window\._preloads\s*=\s*JSON\.parse\s*\(\s*"((?:[^"\\]|\\.)*)"\s*\)', content, re.DOTALL)
+        if not preloads_match:
+            # Try alternative pattern in case the JSON string uses single quotes or different structure
+            preloads_match = re.search(r'window\._preloads\s*=\s*JSON\.parse\s*\(\s*\'((?:[^\'\\]|\\.)*)\'\s*\)', content, re.DOTALL)
+        
+        if not preloads_match:
+            print("   ❌ Could not find profile data in page")
+            return []
+        
+        # Decode the JSON string (it's double-encoded)
+        json_str = preloads_match.group(1)
+        # Unescape the JSON string
+        json_str = json_str.replace('\\"', '"').replace('\\\\', '\\')
+        
+        try:
+            data = json.loads(json_str)
+            print(f"   ✅ Successfully parsed JSON data")
+        except json.JSONDecodeError as e:
+            print(f"   ❌ Failed to parse profile JSON: {e}")
+            return []
+        
+        # Extract newsletter URLs from subscriptions
+        newsletter_urls = []
+        profile_data = data.get('profile', {})
+        print(f"   🔍 Profile data keys: {list(profile_data.keys()) if profile_data else 'No profile data'}")
+        
+        subscriptions = profile_data.get('subscriptions', [])
+        print(f"   🔍 Found {len(subscriptions)} subscriptions")
+        
+        if not subscriptions:
+            print("   ⚠️  No subscriptions found in profile")
+            return []
+        
+        for subscription in subscriptions:
+            publication = subscription.get('publication', {})
+            if publication:
+                subdomain = publication.get('subdomain')
+                custom_domain = publication.get('custom_domain')
+                
+                if custom_domain:
+                    url = f"https://{custom_domain}"
+                elif subdomain:
+                    url = f"https://{subdomain}.substack.com"
+                else:
+                    continue
+                
+                newsletter_urls.append(url)
+                print(f"   📰 Found: {publication.get('name', 'Unknown')} - {url}")
+        
+        print(f"   ✅ Found {len(newsletter_urls)} newsletter(s)")
+        return newsletter_urls
+        
+    except requests.RequestException as e:
+        print(f"   ❌ Error fetching profile page: {e}")
+        return []
+    except Exception as e:
+        print(f"   ❌ Unexpected error parsing profile: {e}")
+        return []
+
+
 def main():
     parser = argparse.ArgumentParser(
         description='Fetch Substack posts published within a time window with like counts',
@@ -457,6 +541,7 @@ def main():
 Examples:
   python substack_scraper.py --url https://example.substack.com --from 2024-01-01 --to 2024-12-31
   python substack_scraper.py --urls newsletters.txt --from 2023-12-01 --to 2023-12-31 --output posts.csv
+  python substack_scraper.py --user stephenreid --from 2024-01-01 --to 2024-12-31
   python substack_scraper.py --urls urls.txt --from "2024-01-01 12:00:00" --to "2024-01-31 23:59:59"
   
 Resume functionality:
@@ -469,6 +554,7 @@ Resume functionality:
     url_group = parser.add_mutually_exclusive_group(required=True)
     url_group.add_argument('--url', type=str, help='Single Substack newsletter URL')
     url_group.add_argument('--urls', type=str, help='File containing Substack URLs (one per line)')
+    url_group.add_argument('--user', type=str, help='Substack profile username (e.g., stephenreid or @stephenreid)')
     
     # Required arguments
     parser.add_argument('--from', type=str, required=True, dest='from_date',
@@ -510,6 +596,11 @@ Resume functionality:
     # Get list of URLs
     if args.url:
         urls = [args.url]
+    elif args.user:
+        # Handle profile username - add @ if not present and construct full URL
+        username = args.user.lstrip('@')  # Remove @ if present
+        profile_url = f"https://substack.com/@{username}"
+        urls = get_newsletters_from_profile(profile_url)
     else:
         urls = load_urls_from_file(args.urls)
         if not urls:
