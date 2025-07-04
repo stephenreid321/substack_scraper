@@ -42,11 +42,6 @@ python substack_scraper.py --user stephenreid --from 2024-01-01 --to 2024-12-31
 
 ### Advanced Usage
 
-**With Specific Date/Time:**
-```bash
-python substack_scraper.py --urls urls.txt --from "2024-01-01 12:00:00" --to "2024-01-31 23:59:59"
-```
-
 **Limit Posts Per Newsletter:**
 ```bash
 python substack_scraper.py --url https://example.substack.com --from 2024-01-01 --to 2024-12-31 --max-posts 50
@@ -64,8 +59,8 @@ python substack_scraper.py --urls urls.txt --from 2024-01-01 --to 2024-12-31 --f
   - `--url`: Single Substack newsletter URL
   - `--urls`: File containing URLs (one per line)
   - `--user`: Substack profile username (e.g., `stephenreid` or `@stephenreid`)
-- `--from`: Start date (YYYY-MM-DD or YYYY-MM-DD HH:MM:SS)
-- `--to`: End date (YYYY-MM-DD or YYYY-MM-DD HH:MM:SS)
+- `--from`: Start date (YYYY-MM-DD)
+- `--to`: End date (YYYY-MM-DD)
 
 ### Optional Arguments
 - `--output`: Output file name (default: `posts.csv`)

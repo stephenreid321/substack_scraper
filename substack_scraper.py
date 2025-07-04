@@ -546,9 +546,9 @@ Resume functionality:
     
     # Required arguments
     parser.add_argument('--from', type=str, required=True, dest='from_date',
-                       help='Start date for time window (YYYY-MM-DD or YYYY-MM-DD HH:MM:SS)')
+                       help='Start date for time window (YYYY-MM-DD)')
     parser.add_argument('--to', type=str, required=True, dest='to_date',
-                       help='End date for time window (YYYY-MM-DD or YYYY-MM-DD HH:MM:SS)')
+                       help='End date for time window (YYYY-MM-DD)')
     
     # Optional arguments
     parser.add_argument('--output', type=str, default='posts.csv', 
