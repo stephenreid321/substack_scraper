@@ -26,9 +26,6 @@ from datetime import datetime, timezone, timedelta
 from urllib.parse import urlparse
 from tqdm import tqdm
 from typing import List, Dict, Optional, Callable, Any
-
-# Add the local substack_api to Python path
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'substack_api'))
 from substack_api import Newsletter, Post
 
 # Configuration constants
@@ -464,13 +461,7 @@ def get_newsletters_from_profile(profile_url: str) -> List[str]:
         response.raise_for_status()
         
         content = response.text
-        
-        # Look for the window._preloads JSON data
-        # First, let's try to find any window._preloads pattern for debugging
-        debug_match = re.search(r'window\._preloads.*?JSON\.parse', content, re.DOTALL)
-        if debug_match:
-            print(f"   🔍 Found window._preloads pattern: {debug_match.group()[:100]}...")
-        
+                
         # More flexible regex to handle various whitespace patterns and escaped quotes
         # The JSON string can contain escaped quotes and span multiple lines
         preloads_match = re.search(r'window\._preloads\s*=\s*JSON\.parse\s*\(\s*"((?:[^"\\]|\\.)*)"\s*\)', content, re.DOTALL)
@@ -497,10 +488,8 @@ def get_newsletters_from_profile(profile_url: str) -> List[str]:
         # Extract newsletter URLs from subscriptions
         newsletter_urls = []
         profile_data = data.get('profile', {})
-        print(f"   🔍 Profile data keys: {list(profile_data.keys()) if profile_data else 'No profile data'}")
         
         subscriptions = profile_data.get('subscriptions', [])
-        print(f"   🔍 Found {len(subscriptions)} subscriptions")
         
         if not subscriptions:
             print("   ⚠️  No subscriptions found in profile")
@@ -520,7 +509,6 @@ def get_newsletters_from_profile(profile_url: str) -> List[str]:
                     continue
                 
                 newsletter_urls.append(url)
-                print(f"   📰 Found: {publication.get('name', 'Unknown')} - {url}")
         
         print(f"   ✅ Found {len(newsletter_urls)} newsletter(s)")
         return newsletter_urls
@@ -581,8 +569,6 @@ Resume functionality:
         if from_date >= to_date:
             raise ValueError("From date must be earlier than to date")
         
-        print(f"📅 Fetching posts published from: {from_date.strftime('%Y-%m-%d %H:%M:%S UTC')}")
-        print(f"📅 To: {to_date.strftime('%Y-%m-%d %H:%M:%S UTC')}")
     except ValueError as e:
         print(f"❌ {e}")
         return
