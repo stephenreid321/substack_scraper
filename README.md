@@ -188,7 +188,8 @@ python substack_scraper.py --user stephenreid --from 2025-01-01 --to 2025-12-31
 
 ---
 
-*Generated example files in `/example` with:*
+The example files in `/example` were generated with:
+
 ```bash
 python substack_scraper.py --urls example/urls.txt --from 2025-06-01 --to 2025-06-30
 📊 Default max posts set to 33 (1 per day since 2025-06-01)
