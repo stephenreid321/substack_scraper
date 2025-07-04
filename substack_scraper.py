@@ -190,26 +190,6 @@ def get_free_subscriber_count(publication_url: str, max_retries: int = DEFAULT_M
     return retry_with_backoff(fetch_subscriber_count, max_retries, f"subscriber count {publication_url}...")
 
 
-def get_post_like_count(post_url: str, max_retries: int = DEFAULT_MAX_RETRIES, original_newsletter_url: str = None) -> str:
-    """Get like count from a Substack post URL with exponential backoff and retries."""
-    if not post_url:
-        return 'No URL'
-    
-    def fetch_like_count():
-        # Initialize Substack Post with the actual URL
-        post = Post(post_url)        
-        
-        # Get post metadata which includes like count
-        metadata = post.get_metadata()
-        
-        if not metadata:
-            return 'No metadata'
-        
-        return str(metadata['reaction_count'])
-    
-    return retry_with_backoff(fetch_like_count, max_retries, f"like count {post_url}...")
-
-
 def fetch_newsletter_posts(newsletter_url: str, since_date: datetime, max_posts: Optional[int] = None) -> List[Dict]:
     """Fetch all posts from a newsletter published since the specified date."""
     try:
@@ -322,7 +302,7 @@ def fetch_newsletter_posts(newsletter_url: str, since_date: datetime, max_posts:
                         'post_subtitle': post_data.get('subtitle', ''),
                         'author': author_name,
                         'word_count': post_data.get('wordcount', 0),
-                        'likes': None,  # Will be filled later
+                        'likes': post_data.get('reaction_count', 0),
                         'is_paid': post_data.get('audience', 'everyone') != 'everyone',
                         'post_id': post_data.get('id', ''),
                     }
@@ -348,20 +328,6 @@ def fetch_newsletter_posts(newsletter_url: str, since_date: datetime, max_posts:
     except Exception as e:
         print(f"❌ Error processing newsletter {newsletter_url}: {e}")
         return []
-
-
-def add_like_counts_to_posts(posts: List[Dict], original_newsletter_url: str = None) -> List[Dict]:
-    """Add like counts to posts sequentially."""
-    print(f"👍 Fetching like counts for {len(posts)} posts...")
-    
-    # Process each post sequentially
-    for post in tqdm(posts, desc="Getting likes", unit="post"):
-        if post['post_url']:
-            post['likes'] = get_post_like_count(post['post_url'], original_newsletter_url=original_newsletter_url)
-        else:
-            post['likes'] = 'No URL'
-    
-    return posts
 
 
 def calculate_popularity_score(likes: str, free_subscriber_count: str, post_date: str) -> float:
@@ -434,9 +400,9 @@ def save_posts_to_csv(posts: List[Dict], output_file: str):
         print("📊 Calculating popularity scores...")
         for post in posts:
             post['popularity_score'] = calculate_popularity_score(
-                post.get('likes', '0'), 
-                post.get('free_subscriber_count', '0'), 
-                post.get('post_date', '')
+                str(post['likes']), 
+                post['free_subscriber_count'], 
+                post['post_date']
             )
     
     # Define CSV fieldnames (added popularity_score)
