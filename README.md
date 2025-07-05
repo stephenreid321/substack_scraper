@@ -1,4 +1,4 @@
-# Substack Post Scraper 📰
+# Substack Surfacer 📰
 
 A Python script that fetches Substack newsletter posts published within a specified time window, along with their like counts, subscriber data, and metadata.
 
@@ -28,29 +28,29 @@ A Python script that fetches Substack newsletter posts published within a specif
 
 **Single Newsletter:**
 ```bash
-python substack_scraper.py --url https://example.substack.com --from 2025-01-01 --to 2025-12-31
+python substack_surfacer.py --url https://example.substack.com --from 2025-01-01 --to 2025-12-31
 ```
 
 **Multiple Newsletters from File:**
 ```bash
-python substack_scraper.py --urls newsletters.txt --from 2025-01-01 --to 2025-12-31 --output posts.csv
+python substack_surfacer.py --urls newsletters.txt --from 2025-01-01 --to 2025-12-31 --output posts.csv
 ```
 
 **From Substack Profile:**
 ```bash
-python substack_scraper.py --user stephenreid --from 2025-01-01 --to 2025-12-31
+python substack_surfacer.py --user stephenreid --from 2025-01-01 --to 2025-12-31
 ```
 
 ### Advanced Usage
 
 **Limit Posts Per Newsletter:**
 ```bash
-python substack_scraper.py --url https://example.substack.com --from 2025-01-01 --to 2025-12-31 --max-posts 50
+python substack_surfacer.py --url https://example.substack.com --from 2025-01-01 --to 2025-12-31 --max-posts 50
 ```
 
 **Force Re-scraping:**
 ```bash
-python substack_scraper.py --urls urls.txt --from 2025-01-01 --to 2025-12-31 --force-rescrape
+python substack_surfacer.py --urls urls.txt --from 2025-01-01 --to 2025-12-31 --force-rescrape
 ```
 
 ## Command Line Arguments 🔧
@@ -148,7 +148,7 @@ posts.csv (or your specified filename)
 
 ### Example 1: Single Newsletter
 ```bash
-python substack_scraper.py --url https://newsletter1.substack.com --from 2025-06-01 --to 2025-06-30
+python substack_surfacer.py --url https://newsletter1.substack.com --from 2025-06-01 --to 2025-06-30
 ```
 
 ### Example 2: Multiple Newsletters (Simple Format)
@@ -161,7 +161,7 @@ https://custom-domain.com
 
 Run:
 ```bash
-python substack_scraper.py --urls urls.txt --from 2025-01-01 --to 2025-12-31
+python substack_surfacer.py --urls urls.txt --from 2025-01-01 --to 2025-12-31
 ```
 
 ### Example 3: Multiple Newsletters with Categories
@@ -173,12 +173,12 @@ https://newsletter2.substack.com philosophy
 
 Run:
 ```bash
-python substack_scraper.py --urls urls.txt --from 2025-01-01 --to 2025-12-31
+python substack_surfacer.py --urls urls.txt --from 2025-01-01 --to 2025-12-31
 ```
 
 ### Example 4: From Profile
 ```bash
-python substack_scraper.py --user stephenreid --from 2025-01-01 --to 2025-12-31
+python substack_surfacer.py --user stephenreid --from 2025-01-01 --to 2025-12-31
 ```
 
 ## Supported URL Formats 🔗
@@ -214,7 +214,7 @@ python substack_scraper.py --user stephenreid --from 2025-01-01 --to 2025-12-31
 The example files in `/example` were generated with:
 
 ```
-python substack_scraper.py --urls urls.txt --from 2025-06-01 --to 2025-06-30
+python substack_surfacer.py --urls urls.txt --from 2025-06-01 --to 2025-06-30
 📊 Default max posts set to 33 (1 per day since 2025-06-01)
 🔗 Processing 4 newsletter(s)...
 

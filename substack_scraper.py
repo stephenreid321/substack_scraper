@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Substack Post Scraper
+Substack Surfacer
 
 This script takes a list of Substack newsletter URLs and fetches all posts 
 published within a specified time window, along with their like counts and metadata.
@@ -18,9 +18,9 @@ https://newsletter1.substack.com economics
 https://newsletter2.substack.com philosophy
 
 Usage:
-    python substack_scraper.py --urls urls.txt --from 2025-01-01 --to 2025-12-31 --output posts.csv
-    python substack_scraper.py --url https://example.substack.com --from 2025-01-01 --to 2025-12-31
-    python substack_scraper.py --user stephenreid --from 2025-01-01 --to 2025-12-31
+    python substack_surfacer.py --urls urls.txt --from 2025-01-01 --to 2025-12-31 --output posts.csv
+    python substack_surfacer.py --url https://example.substack.com --from 2025-01-01 --to 2025-12-31
+    python substack_surfacer.py --user stephenreid --from 2025-01-01 --to 2025-12-31
 """
 
 import os
@@ -295,18 +295,18 @@ def fetch_newsletter_posts(newsletter_url: str, from_date: datetime, to_date: da
                 if isinstance(post_data, str) or not post_data:  # Error or no data
                     continue
                 
-                print(f"🔍 Post metadata: {post_data.get('title', 'Unknown Title')}")
+                print(f"🔍 Post metadata: {post_data.get('title', 'UNKNOWN')}")
                 
                 # Parse post date
                 post_date_str = post_data.get('post_date') or post_data.get('created_at')
                 if not post_date_str:
-                    print(f"   ⚠️  No date found for post: {post_data.get('title', 'Unknown')}")
+                    print(f"   ⚠️  No date found for post: {post_data.get('title', 'UNKNOWN')}")
                     continue
                 
                 # Convert to datetime using the flexible parser
                 post_date = parse_datetime(post_date_str)
                 if not post_date:
-                    print(f"   ⚠️  Could not parse date '{post_date_str}' for post: {post_data.get('title', 'Unknown')}")
+                    print(f"   ⚠️  Could not parse date '{post_date_str}' for post: {post_data.get('title', 'UNKNOWN')}")
                     continue
                 
                 # Check if post is within the specified time window (to_date is now inclusive)
@@ -323,7 +323,7 @@ def fetch_newsletter_posts(newsletter_url: str, from_date: datetime, to_date: da
                         'newsletter_url': newsletter_url,
                         'category': category,
                         'free_subscriber_count': free_subscriber_count,
-                        'likes': post_data.get('reaction_count', 0),
+                        'likes': post_data.get('reaction_count', 'UNKNOWN'),
                         'likes_per_free_subscriber': calculate_likes_per_free_subscriber(post_data.get('reaction_count', 0), free_subscriber_count),
                         'post_url': post.url if hasattr(post, 'url') else post_data.get('canonical_url', ''),                        
                         'author': author_name,                        
@@ -366,6 +366,9 @@ def fetch_newsletter_posts(newsletter_url: str, from_date: datetime, to_date: da
 
 def calculate_likes_per_free_subscriber(likes: str, free_subscriber_count: str) -> float:
     
+    if likes == 'UNKNOWN':
+        return 'UNKNOWN'
+
     if free_subscriber_count == 'UNKNOWN':
         return 'UNKNOWN'
         
@@ -557,10 +560,10 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  python substack_scraper.py --url https://example.substack.com --from 2025-01-01 --to 2025-12-31
-  python substack_scraper.py --urls newsletters.txt --from 2023-12-01 --to 2023-12-31 --output posts.csv
-  python substack_scraper.py --user stephenreid --from 2025-01-01 --to 2025-12-31
-  python substack_scraper.py --urls urls.txt --from "2025-01-01 12:00:00" --to "2025-01-31 23:59:59"
+  python substack_surfacer.py --url https://example.substack.com --from 2025-01-01 --to 2025-12-31
+  python substack_surfacer.py --urls newsletters.txt --from 2023-12-01 --to 2023-12-31 --output posts.csv
+  python substack_surfacer.py --user stephenreid --from 2025-01-01 --to 2025-12-31
+  python substack_surfacer.py --urls urls.txt --from "2025-01-01 12:00:00" --to "2025-01-31 23:59:59"
   
 Resume functionality:
   If the script fails halfway through, simply run the same command again.
