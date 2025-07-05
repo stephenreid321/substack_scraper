@@ -100,7 +100,7 @@ The script generates CSV files with the following columns:
 | `category` | Category from tab-separated input (empty if not specified) |
 | `free_subscriber_count` | Number of free subscribers |
 | `likes` | Post reaction/like count |
-| `likes_per_free_subscriber` | Engagement rate (likes per 100 subscribers) |
+| `likes_per_100_free_subscribers` | Engagement rate (likes per 100 free subscribers) |
 | `post_url` | Direct link to the post |
 | `post_title` | Post title |
 | `post_subtitle` | Post subtitle |

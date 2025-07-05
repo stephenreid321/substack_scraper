@@ -324,7 +324,7 @@ def fetch_newsletter_posts(newsletter_url: str, from_date: datetime, to_date: da
                         'category': category,
                         'free_subscriber_count': free_subscriber_count,
                         'likes': post_data.get('reaction_count', 'UNKNOWN'),
-                        'likes_per_free_subscriber': calculate_likes_per_free_subscriber(post_data.get('reaction_count', 0), free_subscriber_count),
+                        'likes_per_100_free_subscribers': calculate_engagement_rate(post_data.get('reaction_count', 0), free_subscriber_count),
                         'post_url': post.url if hasattr(post, 'url') else post_data.get('canonical_url', ''),                        
                         'author': author_name,                        
                         'post_title': post_data.get('title', 'No Title'),
@@ -364,7 +364,7 @@ def fetch_newsletter_posts(newsletter_url: str, from_date: datetime, to_date: da
         return []
 
 
-def calculate_likes_per_free_subscriber(likes: str, free_subscriber_count: str) -> float:
+def calculate_engagement_rate(likes: str, free_subscriber_count: str) -> float:
     
     if likes == 'UNKNOWN':
         return 'UNKNOWN'
@@ -392,7 +392,7 @@ def save_posts_to_csv(posts: List[Dict], output_file: str):
             
     fieldnames = [
         'newsletter_name', 'newsletter_url', 'category', 'free_subscriber_count',
-        'likes', 'likes_per_free_subscriber',
+        'likes', 'likes_per_100_free_subscribers',
         'post_url', 'author', 'post_title', 'post_subtitle', 'post_date',
         'word_count', 'is_paid', 'post_id'
     ]
