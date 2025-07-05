@@ -1,6 +1,8 @@
 # Substack Surfacer 📰
 
-A Python script that fetches Substack newsletter posts published within a specified time window, along with their like counts, subscriber data, and metadata.
+There was a golden age of Substack where I subscribed to <50 newsletters, and I could more or less read everything I wanted to. Now, however, I subscribe to >200, and I just don’t have time to keep up.
+
+Enter: Substack Surfacer, a Python script that produces CSVs with the posts from all of the Substacks you follow, in a form that makes it easy to sort by the number of likes or (even more useful) the number of likes per subscriber (since of course, newsletters with more subscribers tend to get more likes).
 
 ## Features ✨
 
