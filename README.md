@@ -218,8 +218,8 @@ python substack_surfacer.py --user stephenreid --from 2025-01-01 --to 2025-12-31
 The example files in `/example` were generated with:
 
 ```
-python substack_surfacer.py --urls urls.txt --from 2025-06-01 --to 2025-06-30
-📊 Default max posts set to 33 (1 per day since 2025-06-01)
+python substack_surfacer.py --urls urls.txt --from 2025-05-01 --to 2025-06-30
+📊 Default max posts set to 65 (1 per day since 2025-05-01)
 🔗 Processing 4 newsletter(s)...
 
 📰 Processing newsletter 1/4: https://emergelakefront.substack.com/
@@ -228,34 +228,35 @@ python substack_surfacer.py --urls urls.txt --from 2025-06-01 --to 2025-06-30
    👥 Free subscribers: 22
    📄 Fetching posts...
    📄 Retrieved 8 posts, filtering by date window...
-Filtering posts:   0%|                                                                   | 0/8 [00:00<?, ?post/s]🔍 Post metadata: A New Season at Lakefront 🌼
-Filtering posts:  12%|███████▍                                                   | 1/8 [00:00<00:03,  2.23post/s]🔍 Post metadata: Lakefront Community Kick-off: A Global Gathering at the Edge of the Future 🌍
-Filtering posts:  25%|██████████████▊                                            | 2/8 [00:00<00:01,  3.16post/s]🔍 Post metadata: "Fika with Dan Siegel" at Lakefront
-   ⏹️  Reached post older than 2025-06-01 (post date: 2025-05-21), stopping...
-Filtering posts:  25%|██████████████▊                                            | 2/8 [00:00<00:02,  2.27post/s]
-   ℹ️  Only found 2 posts in time window 2025-06-01 to 2025-06-30
-   ✅ Found 2 posts
+Filtering posts:   0%|                                           | 0/8 [00:00<?, ?post/s]🔍 Post metadata: A New Season at Lakefront 🌼
+Filtering posts:  12%|████▍                              | 1/8 [00:00<00:01,  4.58post/s]🔍 Post metadata: Lakefront Community Kick-off: A Global Gathering at the Edge of the Future 🌍
+Filtering posts:  25%|████████▊                          | 2/8 [00:00<00:01,  4.60post/s]🔍 Post metadata: "Fika with Dan Siegel" at Lakefront
+Filtering posts:  38%|█████████████▏                     | 3/8 [00:00<00:01,  4.79post/s]🔍 Post metadata: Lakefront resident speaks at Tedx Stockholm
+   ⏹️  Reached post older than 2025-05-01 (post date: 2025-04-29), stopping...
+Filtering posts:  38%|█████████████▏                     | 3/8 [00:00<00:01,  3.51post/s]
+   ℹ️  Only found 3 posts in time window 2025-05-01 to 2025-06-30
+   ✅ Found 3 posts
    💾 Saving results for this newsletter...
-💾 Writing 2 posts to CSV...
-Writing CSV: 100%|█████████████████████████████████████████████████████████████| 2/2 [00:00<00:00, 20020.54row/s]
-✅ Successfully saved 2 posts to: substacks/emergelakefront.csv
-   ✅ Saved 2 posts to: substacks/emergelakefront.csv
+💾 Writing 3 posts to CSV...
+Writing CSV: 100%|█████████████████████████████████████| 3/3 [00:00<00:00, 26490.34row/s]
+✅ Successfully saved 3 posts to: substacks/emergelakefront.csv
+   ✅ Saved 3 posts to: substacks/emergelakefront.csv
 
 📰 Processing newsletter 2/4: https://substack.com/@tuckerwalsh
 📰 Fetching posts from: https://tuckerwalsh.substack.com
    👥 Fetching subscriber count...
    👥 Free subscribers: 182
    📄 Fetching posts...
-   📄 Retrieved 33 posts, filtering by date window...
-Filtering posts:   0%|                                                                  | 0/33 [00:00<?, ?post/s]🔍 Post metadata: Deep AF Green
-Filtering posts:   3%|█▊                                                        | 1/33 [00:00<00:14,  2.18post/s]🔍 Post metadata: A Vow to Soul
-   ⏹️  Reached post older than 2025-06-01 (post date: 2025-04-22), stopping...
-Filtering posts:   3%|█▊                                                        | 1/33 [00:00<00:30,  1.05post/s]
-   ℹ️  Only found 1 posts in time window 2025-06-01 to 2025-06-30
+   📄 Retrieved 44 posts, filtering by date window...
+Filtering posts:   0%|                                          | 0/44 [00:00<?, ?post/s]🔍 Post metadata: Deep AF Green
+Filtering posts:   2%|▊                                 | 1/44 [00:00<00:20,  2.13post/s]🔍 Post metadata: A Vow to Soul
+   ⏹️  Reached post older than 2025-05-01 (post date: 2025-04-22), stopping...
+Filtering posts:   2%|▊                                 | 1/44 [00:00<00:42,  1.02post/s]
+   ℹ️  Only found 1 posts in time window 2025-05-01 to 2025-06-30
    ✅ Found 1 posts
    💾 Saving results for this newsletter...
 💾 Writing 1 posts to CSV...
-Writing CSV: 100%|█████████████████████████████████████████████████████████████| 1/1 [00:00<00:00, 28728.11row/s]
+Writing CSV: 100%|█████████████████████████████████████| 1/1 [00:00<00:00, 15592.21row/s]
 ✅ Successfully saved 1 posts to: substacks/tuckerwalsh.csv
    ✅ Saved 1 posts to: substacks/tuckerwalsh.csv
 
@@ -265,15 +266,15 @@ Writing CSV: 100%|████████████████████�
    👥 Free subscribers: UNKNOWN
    📄 Fetching posts...
    📄 Retrieved 23 posts, filtering by date window...
-Filtering posts:   0%|                                                                  | 0/23 [00:00<?, ?post/s]🔍 Post metadata: Why Privacy makes us Human
-Filtering posts:   4%|██▌                                                       | 1/23 [00:00<00:05,  4.04post/s]🔍 Post metadata: Technology is Re-Enchanting the World
-   ⏹️  Reached post older than 2025-06-01 (post date: 2025-04-12), stopping...
-Filtering posts:   4%|██▌                                                       | 1/23 [00:00<00:10,  2.06post/s]
-   ℹ️  Only found 1 posts in time window 2025-06-01 to 2025-06-30
+Filtering posts:   0%|                                          | 0/23 [00:00<?, ?post/s]🔍 Post metadata: Why Privacy makes us Human
+Filtering posts:   4%|█▍                                | 1/23 [00:00<00:04,  4.56post/s]🔍 Post metadata: Technology is Re-Enchanting the World
+   ⏹️  Reached post older than 2025-05-01 (post date: 2025-04-12), stopping...
+Filtering posts:   4%|█▍                                | 1/23 [00:00<00:10,  2.16post/s]
+   ℹ️  Only found 1 posts in time window 2025-05-01 to 2025-06-30
    ✅ Found 1 posts
    💾 Saving results for this newsletter...
 💾 Writing 1 posts to CSV...
-Writing CSV: 100%|██████████████████████████████████████████████████████████████| 1/1 [00:00<00:00, 5184.55row/s]
+Writing CSV: 100%|█████████████████████████████████████| 1/1 [00:00<00:00, 22192.08row/s]
 ✅ Successfully saved 1 posts to: substacks/octopusyarn.csv
    ✅ Saved 1 posts to: substacks/octopusyarn.csv
 
@@ -282,27 +283,30 @@ Writing CSV: 100%|████████████████████�
    👥 Fetching subscriber count...
    👥 Free subscribers: 3,000
    📄 Fetching posts...
-   📄 Retrieved 33 posts, filtering by date window...
-Filtering posts:   0%|                                                                  | 0/33 [00:00<?, ?post/s]🔍 Post metadata: Introducing Hilma Church-Turing
-Filtering posts:   3%|█▊                                                        | 1/33 [00:00<00:07,  4.04post/s]🔍 Post metadata: In Correspondence #49
-Filtering posts:   6%|███▌                                                      | 2/33 [00:00<00:07,  4.40post/s]🔍 Post metadata: Four reasons to join us at Emerge Lakefront
-   ⏹️  Reached post older than 2025-06-01 (post date: 2025-05-24), stopping...
-Filtering posts:   6%|███▌                                                      | 2/33 [00:00<00:11,  2.77post/s]
-   ℹ️  Only found 2 posts in time window 2025-06-01 to 2025-06-30
-   ✅ Found 2 posts
+   📄 Retrieved 65 posts, filtering by date window...
+Filtering posts:   0%|                                          | 0/65 [00:00<?, ?post/s]🔍 Post metadata: Substack Surfacer: countering Substack overwhelm
+Filtering posts:   2%|▌                                 | 1/65 [00:00<00:13,  4.66post/s]🔍 Post metadata: Introducing Hilma Church-Turing
+Filtering posts:   3%|█                                 | 2/65 [00:00<00:13,  4.75post/s]🔍 Post metadata: In Correspondence #49
+Filtering posts:   5%|█▌                                | 3/65 [00:00<00:13,  4.74post/s]🔍 Post metadata: Four reasons to join us at Emerge Lakefront
+Filtering posts:   6%|██                                | 4/65 [00:00<00:13,  4.55post/s]🔍 Post metadata: In Correspondence #48
+Filtering posts:   8%|██▌                               | 5/65 [00:01<00:14,  4.11post/s]🔍 Post metadata: Life as Practice: A Yearlong Group Mentorship
+   ⏹️  Reached post older than 2025-05-01 (post date: 2025-04-30), stopping...
+Filtering posts:   8%|██▌                               | 5/65 [00:01<00:16,  3.67post/s]
+   ℹ️  Only found 4 posts in time window 2025-05-01 to 2025-06-30
+   ✅ Found 4 posts
    💾 Saving results for this newsletter...
-💾 Writing 2 posts to CSV...
-Writing CSV: 100%|█████████████████████████████████████████████████████████████| 2/2 [00:00<00:00, 25653.24row/s]
-✅ Successfully saved 2 posts to: substacks/stephenreid.csv
-   ✅ Saved 2 posts to: substacks/stephenreid.csv
+💾 Writing 4 posts to CSV...
+Writing CSV: 100%|█████████████████████████████████████| 4/4 [00:00<00:00, 40427.03row/s]
+✅ Successfully saved 4 posts to: substacks/stephenreid.csv
+   ✅ Saved 4 posts to: substacks/stephenreid.csv
 
 💾 Saving combined results from all 4 newsletters...
-💾 Writing 6 posts to CSV...
-Writing CSV: 100%|█████████████████████████████████████████████████████████████| 6/6 [00:00<00:00, 40265.32row/s]
-✅ Successfully saved 6 posts to: combined.csv
+💾 Writing 9 posts to CSV...
+Writing CSV: 100%|█████████████████████████████████████| 9/9 [00:00<00:00, 51080.83row/s]
+✅ Successfully saved 9 posts to: combined.csv
 ✅ Saved combined results: combined.csv
 
-🎉 Completed! Processed 6 posts total.
+🎉 Completed! Processed 9 posts total.
 📊 Newly processed newsletters: 4
 📊 Individual newsletter files saved after each processing step
 📊 Combined results also saved for all newsletters

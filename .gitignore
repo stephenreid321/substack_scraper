@@ -1,5 +1,5 @@
 .~lock.*
 .DS_Store
-urls.txt
-substacks
-combined.csv
+/urls.txt
+/substacks
+/combined.csv

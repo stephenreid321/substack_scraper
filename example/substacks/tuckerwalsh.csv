@@ -1,2 +1,2 @@
-newsletter_name,newsletter_url,free_subscriber_count,likes,likes_per_free_subscriber,post_url,post_title,post_subtitle,post_date,author,word_count,is_paid,post_id
-tuckerwalsh,https://tuckerwalsh.substack.com,182,16,8.79,https://tuckerwalsh.substack.com/p/deep-af-green,Deep AF Green,"Why healthy, deeply embodied Green values are so often epically overlooked...",2025-06-04 18:13:00,Tucker Walsh,3068,False,163975006
+newsletter_name,newsletter_url,category,free_subscriber_count,likes,likes_per_100_free_subscribers,post_url,author,post_title,post_subtitle,post_date,word_count,is_paid,post_id
+tuckerwalsh,https://tuckerwalsh.substack.com,,182,16,8.79,https://tuckerwalsh.substack.com/p/deep-af-green,Tucker Walsh,Deep AF Green,"Why healthy, deeply embodied Green values are so often epically overlooked...",2025-06-04 18:13:00,3068,False,163975006

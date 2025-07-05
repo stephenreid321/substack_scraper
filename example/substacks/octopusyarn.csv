@@ -1,2 +1,2 @@
-newsletter_name,newsletter_url,free_subscriber_count,likes,likes_per_free_subscriber,post_url,post_title,post_subtitle,post_date,author,word_count,is_paid,post_id
-octopusyarn,https://octopusyarn.substack.com,UNKNOWN,11,UNKNOWN,https://octopusyarn.substack.com/p/why-hiding-makes-us-human,Why Privacy makes us Human,"Selective Disclosure: Freedom, Power, and Intimacy ",2025-06-18 12:43:48,Herald of the Octopus,2135,False,166195343
+newsletter_name,newsletter_url,category,free_subscriber_count,likes,likes_per_100_free_subscribers,post_url,author,post_title,post_subtitle,post_date,word_count,is_paid,post_id
+octopusyarn,https://octopusyarn.substack.com,,UNKNOWN,11,UNKNOWN,https://octopusyarn.substack.com/p/why-hiding-makes-us-human,Herald of the Octopus,Why Privacy makes us Human,"Selective Disclosure: Freedom, Power, and Intimacy ",2025-06-18 12:43:48,2135,False,166195343
