@@ -4,6 +4,8 @@ There was a golden age of Substack where I subscribed to <50 newsletters, and I 
 
 Enter: Substack Surfacer, a Python script that produces CSVs with the posts from all of the Substacks you follow, in a form that makes it easy to sort by the number of likes or (even more useful) the number of likes per subscriber (since of course, newsletters with more subscribers tend to get more likes).
 
+Announcement post: https://stephenreid.substack.com/p/substack-surfacer-countering-substack
+
 ## Features ✨
 
 - **Flexible Input Options**: Single URL, file with multiple URLs, or Substack profile username
